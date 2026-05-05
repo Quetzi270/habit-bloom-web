@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Quote, Sparkles, Target } from 'lucide-react';
 import Header from './components/Header.jsx';
 import ProgressSummary from './components/ProgressSummary.jsx';
@@ -5,9 +6,33 @@ import HabitForm from './components/HabitForm.jsx';
 import HabitList from './components/HabitList.jsx';
 import Footer from './components/Footer.jsx';
 
-const demoHabits = [];
+function createHabitId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return `habit-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
 
 function App() {
+  const [habits, setHabits] = useState([]);
+
+  function handleCreateHabit(formData) {
+    const newHabit = {
+      id: createHabitId(),
+      name: formData.name,
+      category: formData.category,
+      trackingType: formData.trackingType,
+      goal: Number(formData.goal),
+      unit: formData.unit,
+      color: formData.color,
+      current: 0,
+      completed: false,
+    };
+
+    setHabits((currentHabits) => [newHabit, ...currentHabits]);
+  }
+
   return (
     <div className="app-shell">
       <Header />
@@ -40,17 +65,17 @@ function App() {
         <section className="section dashboard-section" aria-label="Panel principal de hábitos">
           <div className="container dashboard-layout">
             <div className="main-column">
-              <HabitList habits={demoHabits} />
+              <HabitList habits={habits} />
             </div>
             <div className="side-column">
-              <ProgressSummary habits={demoHabits} />
+              <ProgressSummary habits={habits} />
             </div>
           </div>
         </section>
 
         <section id="crear" className="section">
           <div className="container">
-            <HabitForm />
+            <HabitForm onCreateHabit={handleCreateHabit} />
           </div>
         </section>
 
